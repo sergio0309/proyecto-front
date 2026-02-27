@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/auth/Login.vue";
-import HelloWorld from "../components/HelloWorld.vue";
 import Usuario from "../views/admin/usuarios/Usuario.vue";
+import AppLayout from '@/layout/AppLayout.vue';
+import Perfil from "../views/admin/perfil/Perfil.vue";
 
 const routes =[
     {
@@ -15,10 +16,22 @@ const routes =[
         meta:{ redirectIfAuth: true }
     },
     {
-        path: '/admin/usuario',
-        component: Usuario,
-        name: 'Usuario',
-        meta: { requireAuth: true }
+        path: '/admin',
+        component: AppLayout,
+        children: [
+            {
+                path: 'perfil',
+                component: Perfil,
+                name: 'Perfil',
+                meta: { requireAuth: true }
+            },
+            {
+                path: 'usuario',
+                component: Usuario,
+                name: 'Usuario',
+                meta: { requireAuth: true }
+            }
+        ]
     }
 ]
 
@@ -37,7 +50,7 @@ router.beforeEach((to, from, next) => {
         return next();
     }
     if(to.meta.redirectIfAuth && token ){
-        return next({name: "Usuario"})
+        return next({name: "Perfil"})
     }
 
     return next()

@@ -68,7 +68,7 @@ async function funIngresar() {
         localStorage.setItem('access_token', res.data.access_token)
 
         //redireccionar
-        router.push({name: 'Usuario'})
+        router.push({name: 'Perfil'})
 
 
     } catch (error) {

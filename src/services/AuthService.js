@@ -10,7 +10,7 @@ export default {
     // perfil(){
     //     return Api().get("/v1/auth/profile");
     // },
-    // logout(){
-    //     return Api().post("/v1/auth/logout")
-    // }
+    logout(){
+        return Api().post("logout")
+    }
 }
