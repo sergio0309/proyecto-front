@@ -1,13 +1,14 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/auth/Login.vue";
-import Usuario from "../views/admin/usuarios/Usuario.vue";
 import AppLayout from '@/layout/AppLayout.vue';
-import Perfil from "../views/admin/perfil/Perfil.vue";
+import Perfil from "../views/admin/perfil/PerfilView.vue";
+import UsuariosView from "../views/admin/usuarios/UsuariosView.vue";
 
 const routes =[
     {
+        // Redirecciona a la ruta raíz a la página de login
         path: '/',
-        redirect: '/auth/login'
+        redirect: '/auth/login',
     },
     {
         path: '/auth/login',
@@ -18,21 +19,67 @@ const routes =[
     {
         path: '/admin',
         component: AppLayout,
+        name: 'admin',
         children: [
+            {
+                path: 'dashboard',
+                component: () => import('../views/dashboard/DashboardView.vue'),
+                name: 'dashboard',
+                meta: { requireAuth: true }
+            },
             {
                 path: 'perfil',
                 component: Perfil,
-                name: 'Perfil',
+                name: 'perfil',
                 meta: { requireAuth: true }
             },
             {
                 path: 'usuario',
-                component: Usuario,
-                name: 'Usuario',
+                component: UsuariosView,
+                name: 'usuarios',
+                meta: { requireAuth: true }
+            },
+            {
+                path: 'pacientes',
+                component: () => import('../views/pacientes/PacientesView.vue'),
+                name: 'pacientes',
+                meta: { requireAuth: true }
+            },
+            {
+                path: 'ordenes',
+                component: () => import('../views/ordenes/OrdenesView.vue'),
+                name: 'ordenes',
+                meta: { requireAuth: true }
+            },
+            {
+                path: 'proformas',
+                component: () => import('../views/proformas/ProformasView.vue'),
+                name: 'proformas',
+                meta: { requireAuth: true }
+            },
+            {
+                path: 'reportes',
+                component: () => import('../views/reportes/ReportesView.vue'),
+                name: 'reportes',
+                meta: { requireAuth: true }
+            },
+            {
+                path: 'resultados',
+                component: () => import('../views/resultados/ResultadosView.vue'),
+                name: 'resultados',
                 meta: { requireAuth: true }
             }
         ]
-    }
+    },
+    {
+        path: '/error-404',
+        name: 'error-404',
+        component: () => import('../views/Errors/FourZeroFour.vue'),
+        meta: {
+            requireAuth: false,
+            title: '404 Error',
+        },
+    },
 ]
 
 const router = createRouter({
@@ -50,7 +97,7 @@ router.beforeEach((to, from, next) => {
         return next();
     }
     if(to.meta.redirectIfAuth && token ){
-        return next({name: "Perfil"})
+        return next({name: "perfil"})
     }
 
     return next()

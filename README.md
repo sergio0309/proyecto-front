@@ -1,5 +1,27 @@
-# Vue 3 + Vite
+# Proyecto ISSY Clinica (Frontend)
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+- Un SaaS para clínicas basada en el modelo de negocio Freemium:
+  1. Gratis con límites
+  2. Suscripción de 250 Bs (por ahora ) para acceso completo -> (acá esta nuestro producto)
+  3. Instalación con monto a tratar (Caso Enterprise)
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+# Descripción General
+
+Frontend web SPA que consume una API Rest (Laravel)
+App Desacoplada que se va a servir ya sea en Vercel o Hostinger (VPS de la consultora)
+
+# Stack:
+
+- Vue 3
+- Tailwind CSS V4
+- PrimeVue (Dashboard free)
+- Pinia (manejo de estado)
+- Vite
+
+# Nota
+
+- La "puerta de entrada" de la app es la web "https://issy-clinica.ingeniasoft.cloud/" , landing de dicho SaaS
+
+# Nota 2
+
+- La Documentación del proyecto se encuentra en /docs

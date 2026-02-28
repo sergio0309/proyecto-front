@@ -2,158 +2,79 @@
 import { ref } from 'vue';
 import AppMenuItem from './AppMenuItem.vue';
 
+/**
+ * Menu model.
+ * 
+ * Menú SideBar desacoplado para facilitar su mantenimiento y escalabilidad.
+ * Se renderiza en AppMenuItem.vue de forma recursiva para soportar submenús.
+ * 
+ * Label => Texto a mostrar en la UI (navegador)
+ * to => Ruta a la que se redirige (es en realidad el "name" dado a cada ruta en el router)
+ * icon => Icono a mostrar (usando clases de PrimeVue)
+ * items => Submenús (si los hay), con la misma estructura que el menú principal
+ */
 const model = ref([
     {
-        label: 'ADMIN',
+        label: 'Inicio',
         items: [
             {
-                label: 'Administrador',
+                label: 'Panel de administración',
                 icon: 'pi pi-fw pi-home',
-                to: '/'
+                to: 'dashboard'
             },
             {
                 label: 'Mi Perfil',
                 icon: 'pi pi-fw pi-user',
-                to: '/admin/perfil'
+                to: 'perfil'
             }
 
         ]
     },
     {
-        label: 'Gestion Seguridad',
+        label: 'Gestion & Seguridad',
         path: '/uikit',
         items: [
             {
-                label: 'Usuarios',
+                label: 'Usuarios del sistema',
                 icon: 'pi pi-fw pi-users',
-                to: '/admin/usuario'
+                to: 'usuarios'
             },
         ]
     },
     {
-        label: 'Pages',
+        label: 'Opciones',
         icon: 'pi pi-fw pi-briefcase',
-        path: '/pages',
+        path: '/admin',
         items: [
             {
-                label: 'Landing',
-                icon: 'pi pi-fw pi-globe',
-                to: '/landing'
+                label: 'Pacientes',
+                icon: 'pi pi-fw pi-users',
+                to: 'pacientes'
             },
             {
-                label: 'Auth',
-                icon: 'pi pi-fw pi-user',
-                path: '/auth',
-                items: [
-                    {
-                        label: 'Login',
-                        icon: 'pi pi-fw pi-sign-in',
-                        to: '/auth/login'
-                    },
-                    {
-                        label: 'Error',
-                        icon: 'pi pi-fw pi-times-circle',
-                        to: '/auth/error'
-                    },
-                    {
-                        label: 'Access Denied',
-                        icon: 'pi pi-fw pi-lock',
-                        to: '/auth/access'
-                    }
-                ]
-            },
-        ]
-    },
-    {
-        label: 'Hierarchy',
-        icon: 'pi pi-fw pi-align-left',
-        path: '/hierarchy',
-        items: [
-            {
-                label: 'Submenu 1',
-                icon: 'pi pi-fw pi-align-left',
-                path: '/submenu_1',
-                items: [
-                    {
-                        label: 'Submenu 1.1',
-                        icon: 'pi pi-fw pi-align-left',
-                        path: '/submenu_1_1',
-                        items: [
-                            {
-                                label: 'Submenu 1.1.1',
-                                icon: 'pi pi-fw pi-align-left'
-                            },
-                            {
-                                label: 'Submenu 1.1.2',
-                                icon: 'pi pi-fw pi-align-left'
-                            },
-                            {
-                                label: 'Submenu 1.1.3',
-                                icon: 'pi pi-fw pi-align-left'
-                            }
-                        ]
-                    },
-                    {
-                        label: 'Submenu 1.2',
-                        icon: 'pi pi-fw pi-align-left',
-                        path: '/submenu_1_2',
-                        items: [
-                            {
-                                label: 'Submenu 1.2.1',
-                                icon: 'pi pi-fw pi-align-left'
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                label: 'Submenu 2',
-                icon: 'pi pi-fw pi-align-left',
-                path: '/submenu_2',
-                items: [
-                    {
-                        label: 'Submenu 2.1',
-                        icon: 'pi pi-fw pi-align-left',
-                        path: '/submenu_2_1',
-                        items: [
-                            {
-                                label: 'Submenu 2.1.1',
-                                icon: 'pi pi-fw pi-align-left'
-                            },
-                            {
-                                label: 'Submenu 2.1.2',
-                                icon: 'pi pi-fw pi-align-left'
-                            }
-                        ]
-                    },
-                    {
-                        label: 'Submenu 2.2',
-                        icon: 'pi pi-fw pi-align-left',
-                        path: '/submenu_2_2',
-                        items: [
-                            {
-                                label: 'Submenu 2.2.1',
-                                icon: 'pi pi-fw pi-align-left'
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        label: 'Get Started',
-        path: '/start',
-        items: [
-            {
-                label: 'Documentation',
+                label: 'Órdenes',
                 icon: 'pi pi-fw pi-book',
-                to: '/start/documentation'
+                to: 'ordenes'
             },
             {
-                label: 'View Source',
-                icon: 'pi pi-fw pi-github',
-                url: 'https://github.com/primefaces/sakai-vue',
+                label: 'Proformas',
+                icon: 'pi pi-fw pi-file',
+                to: 'proformas'
+            },
+            {
+                label: 'Resultados',
+                icon: 'pi pi-fw pi-check',
+                to: 'resultados'
+            },
+        ]
+    },
+    {
+        label: '¿Necesitas Ayuda?',
+        items: [
+            {
+                label: 'Contáctanos',
+                url: 'https://wa.me/59164308328',
+                icon: 'pi pi-fw pi-phone',
                 target: '_blank'
             }
         ]
