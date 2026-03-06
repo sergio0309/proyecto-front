@@ -10,12 +10,12 @@
         ERROR
       </h1>
 
-      <img src="/images/error/404.svg" alt="404" class="dark:hidden" />
+      <!-- <img src="/images/error/404.svg" alt="404" class="dark:hidden" />
       <img
         src="/images/error/404-dark.svg"
         alt="404"
         class="hidden dark:block"
-      />
+      /> -->
 
       <p
         class="mt-10 mb-6 text-base text-gray-700 dark:text-gray-400 sm:text-lg"

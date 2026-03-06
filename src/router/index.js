@@ -3,6 +3,7 @@ import Login from "../views/auth/Login.vue";
 import AppLayout from '@/layout/AppLayout.vue';
 import Perfil from "../views/admin/perfil/PerfilView.vue";
 import UsuariosView from "../views/admin/usuarios/UsuariosView.vue";
+import FourZeroFour from "../views/errors/FourZeroFour.vue";
 
 const routes =[
     {
@@ -74,7 +75,8 @@ const routes =[
     {
         path: '/error-404',
         name: 'error-404',
-        component: () => import('../views/Errors/FourZeroFour.vue'),
+        // component: () => import('../views/Errors/FourZeroFour.vue'),
+        component: FourZeroFour,
         meta: {
             requireAuth: false,
             title: '404 Error',
