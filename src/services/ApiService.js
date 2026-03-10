@@ -15,7 +15,7 @@ export const BASE_URL_API = `${BASE_URL}`;
 
 export default function Api(){
     
-    const token = localStorage.getItem("access_token")
+    const token = localStorage.getItem("token")
 
     const api = axios.create({
         baseURL: BASE_URL_API,
@@ -33,7 +33,7 @@ export default function Api(){
             // error 401 (auth)
             if (error.response?.status === 401){
 
-                localStorage.removeItem("access_token")
+                localStorage.removeItem("token")
                 location.href = "/auth/login"
             }
 
@@ -46,7 +46,7 @@ export default function Api(){
 
 export function ApiAuth(){
     
-    const token = localStorage.getItem("access_token")
+    const token = localStorage.getItem("token")
 
     const api = axios.create({
         baseURL: BASE_URL_API,
@@ -63,7 +63,7 @@ export function ApiAuth(){
             // error 401 (auth)
             if (error.response?.status === 401){
 
-                localStorage.removeItem("access_token")
+                localStorage.removeItem("token")
                 location.href = "/auth/login"
             }
 

@@ -90,7 +90,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem("access_token")
+    const token = localStorage.getItem("token")
 
     if(to.meta.requireAuth){
         if(!token){
