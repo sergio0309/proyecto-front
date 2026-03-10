@@ -1,4 +1,4 @@
-import Api from "./ApiService"
+import Api from "./apiService"
 
 export default {
     getUsuarios(){

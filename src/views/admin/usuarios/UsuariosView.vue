@@ -12,7 +12,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import UsuarioService from '@/services/UsuarioService';
+import usuarioService from '@/services/usuarioService';
 
 const usuarios = ref([])
 
@@ -22,7 +22,7 @@ onMounted(() => {
 
 const funListarUsuarios = async () => {
     try {
-        const { data } = await UsuarioService.getUsuarios()
+        const { data } = await usuarioService.getUsuarios()
         usuarios.value = data
         console.log(usuarios);
         

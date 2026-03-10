@@ -1,4 +1,5 @@
-import Api, { ApiAuth } from "./ApiService";
+import Api, { ApiAuth } from "./apiService";
+
 
 export default {
     login(credenciales){

@@ -51,7 +51,7 @@
 import { ref } from 'vue';
 
 import { useRouter } from 'vue-router';
-import AuthService from '../../services/AuthService';
+import AuthService from '../../services/authService';
 
 const credenciales = ref({email: "", password: ""});
 const respuesta = ref();

@@ -39,6 +39,11 @@ const model = ref([
                 icon: 'pi pi-fw pi-users',
                 to: 'usuarios'
             },
+            {
+                label: 'Roles',
+                icon: 'pi pi-fw pi-users',
+                to: 'roles'
+            }
         ]
     },
     {
