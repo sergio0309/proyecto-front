@@ -1,7 +1,10 @@
 import Api from "./apiService"
 
 export default {
-    getUsuarios(){
+    funListarUsuarios: () => {
         return Api().get("/users")
+    },
+    funGuardar: () => {
+        return Api().post("/users", datos)
     }
 }

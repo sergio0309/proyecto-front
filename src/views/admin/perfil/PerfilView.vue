@@ -6,6 +6,11 @@
       <ProfileCard />
       <PersonalInfoCard />
       <AddressCard />
+      <div class="pt-12 pb-8">
+          <button class="bg-red-700 hover:bg-red-900 text-white font-bold py-2 px-4 rounded-full" @click="funSalir()">
+          Cerrar Sesion
+          </button> 
+      </div>
     </div>
 </template>
 
@@ -14,5 +19,12 @@ import { ref } from 'vue'
 import ProfileCard from '../../../components/perfil/ProfileCard.vue'
 import PersonalInfoCard from '../../../components/perfil/PersonalInfoCard.vue'
 import AddressCard from '../../../components/perfil/AddressCard.vue'
+import authService from '../../../services/authService'
 const currentPageTitle = ref('User Profile')
+
+const funSalir = async () => {
+  await authService.logout()
+  localStorage.removeItem('access_token');
+  router.push({name: 'Login'})
+}
 </script>

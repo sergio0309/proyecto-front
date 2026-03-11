@@ -58,24 +58,102 @@
         </DataTable>
     </div>
 
-    <Dialog v-model:visible="visibleUsuario" :style="{ width: '600px' }" header="USUARIO">
-        <div class="flex flex-col gap-6">
-            <div>
-                <label for="name" class="block font-bold mb-3">Nombre Rol</label>
-                <!-- <InputText 
-                    v-model="role.name" 
-                    id="name" required 
-                    autofocus fluid 
-                    :disabled="soloVer"
-                /> -->
+    <Dialog v-model:visible="visibleUsuario" :style="{ width: '700px' }" header="USUARIO">
+
+        <div class="flex flex-col gap-4">
+            <div class="flex gap-4">
+
+                <div class="flex-1">
+                    <label class="font-bold">CI</label>
+                    <InputText v-model="usuario.ci" class="w-full" />
+                </div>
+
+                <div class="flex-1">
+                    <label class="font-bold">Correo</label>
+                    <InputText v-model="usuario.email" class="w-full" />
+                </div>
+
             </div>
-            
+
+            <div class="grid grid-cols-12 gap-4">
+
+                <div class="col-span-6">
+                    <label class="font-bold">Nombre</label>
+                    <InputText v-model="usuario.name" class="w-full" />
+                </div>
+
+                <div class="col-span-3">
+                    <label class="font-bold">Telefono</label>
+                    <InputText v-model="usuario.phone" class="w-full" />
+                </div>
+
+                <div class="col-span-3">
+                    <label class="font-bold">Fecha de Nacimiento</label>
+                    <DatePicker
+                        v-model="usuario.fecha_nacimiento"
+                        dateFormat="dd/mm/yy"
+                        class="w-full"
+                    />
+                </div>
+
+            </div>
+
+            <div class="flex gap-4">
+                <div class="flex-1">
+                    <label class="font-bold">Dirección</label>
+                    <InputText v-model="usuario.address" fluid />
+                </div>
+
+                <div class="flex-1">
+                    <label class="font-bold">Contraseña</label>
+                    <Password v-model="usuario.password" 
+                    toggleMask 
+                    promptLabel="Ingrese una contraseña"
+                    weakLabel="Débil"
+                    mediumLabel="Media"
+                    strongLabel="Fuerte"
+                    fluid
+                    />
+                </div>
+
+                <div class="flex-1">
+                    <label class="font-bold">Foto Perfil</label>
+
+                    <FileUpload
+                        customUpload
+                        @uploader="SubirImagenProducto($event)"
+                        :multiple="false"
+                        accept="image/*"
+                        :maxFileSize="1000000"
+                        mode="basic"
+                        chooseLabel="Seleccionar Imagen"
+                        class="w-full"
+                    />
+                </div>
+            </div>
+
+
+            <div class="flex flex-col gap-2">
+                <label class="font-bold">Roles</label>
+
+                <MultiSelect
+                    v-model="usuario.roles"
+                    :options="roles"
+                    optionLabel="name"
+                    optionValue="id"
+                    placeholder="Seleccione roles"
+                    display="chip"
+                    filter
+                    class="w-full"
+                />
+            </div>
         </div>
 
         <template #footer>
-            <Button label="Cancelar" icon="pi pi-times" text @click="visibleUsuario = false" />
-            <Button label="Guardar" icon="pi pi-check" @click="funGuardar()" v-if="!soloVer"/>
+            <Button label="Cancelar" icon="pi pi-times" text @click="visibleUsuario=false" />
+            <Button label="Guardar" icon="pi pi-check" @click="funGuardar()" />
         </template>
+
     </Dialog>
 
 
@@ -85,28 +163,37 @@
 import { BASE_URL } from '@/services/apiService'
 import { onMounted, ref } from 'vue';
 import usuarioService from '@/services/usuarioService';
+import rolService from '@/services/rolService';
 
 const usuarios = ref([])
+const usuario = ref({})
+const roles = ref([])
 const visibleUsuario = ref(false)
 
 onMounted(() => {
     funListarUsuarios()
+    funListarRoles()
 })
 
 const funListarUsuarios = async () => {
-    try {
-        const { data } = await usuarioService.getUsuarios()
-        usuarios.value = data
-        console.log(usuarios);
-        
-    } catch (error) {
-        console.log(error.response)
-    }
-    
+    const { data } = await usuarioService.funListarUsuarios()
+    usuarios.value = data
+}
+
+const funListarRoles = async () => {
+    const { data } = await rolService.funListarRoles()
+    roles.value = data
 }
 
 const funNuevoUsuario = () => {
+    usuario.value = {}
     visibleUsuario.value = true
+}
+
+const funGuardar = async () => {    
+    const { data } = await usuarioService.funGuardar(usuario.value)
+    visibleUsuario.value = false
+    funListarUsuarios()
 }
 
 </script>

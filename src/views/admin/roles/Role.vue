@@ -195,6 +195,7 @@ const funGuardar = async () => {
 
         }
     } catch (error) {
+        visibleRol.value = false
         Swal.fire({
             title: "Problemas al registrar!",
             text: "Ocurrió un error al guardar el rol",
