@@ -10,6 +10,9 @@ export default {
     },
     funModificar: (id, datos) => {
         return Api().put(`/roles/${id}`, datos)
+    },
+    funEliminar: (id) => {
+        return Api().delete(`/roles/${id}`)
     }
 
 }
