@@ -92,12 +92,14 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem("access_token")
 
-    if(to.meta.requireAuth){
-        if(!token){
-        return next({name: "Login"})
+    if (to.meta.requireAuth) {
+        if (!token) {
+            return next({ name: "Login" });
         }
+
         return next();
     }
+
     if(to.meta.redirectIfAuth && token ){
         return next({name: "perfil"})
     }
