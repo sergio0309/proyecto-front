@@ -1,5 +1,5 @@
 import axios from "axios";
-
+//ARCHIVO DEPRECADO, POR FAVOR YA NO USAR
 export let BASE_URL;
 const dev = false;
 

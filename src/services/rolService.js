@@ -1,18 +1,18 @@
-import Api from "./apiService"
+import httpClient from "../utils/httpClient"
 
 export default {
     funListarRoles: () => {
-        return Api().get("/roles")
+        return httpClient.get("/roles")
     },
 
     funGuardar: (datos) => {
-        return Api().post("/roles", datos)
+        return httpClient.post("/roles", datos)
     },
     funModificar: (id, datos) => {
-        return Api().put(`/roles/${id}`, datos)
+        return httpClient.put(`/roles/${id}`, datos)
     },
     funEliminar: (id) => {
-        return Api().delete(`/roles/${id}`)
+        return httpClient.delete(`/roles/${id}`)
     }
 
 }

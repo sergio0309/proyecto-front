@@ -18,7 +18,7 @@ import AuthService from "../services/AuthService";
  */
 export const useAuthStore = defineStore("auth", () => {
   const user = ref(null);
-  const token = ref(localStorage.getItem("access_token") || null);
+  const token = ref(localStorage.getItem("token") || null);
   const loading = ref(false);
 
   async function login(credentials) {
@@ -28,7 +28,7 @@ export const useAuthStore = defineStore("auth", () => {
       console.log("respuesta del login", response.data)
       // Guardamos el token en Pinia y en localStorage
       token.value = response.data?.token || alert('Error in the backend [RESPONSE]'); // SOLO para debug-> TODO: borrar esto en prod
-      localStorage.setItem("access_token", token.value); 
+      localStorage.setItem("token", token.value); 
 
       // 3. (Opcional) Guardamos datos del usuario si el login los devuelve (ej. para el perfil tipo: <h1> {{user.name}} </h1>)
       user.value = response.data.user || null;
@@ -54,7 +54,7 @@ export const useAuthStore = defineStore("auth", () => {
       // Limpiamos todo sin importar lo que diga el backend
       user.value = null;
       token.value = null;
-      localStorage.removeItem("access_token");
+      localStorage.removeItem("token");
     }
   }
 

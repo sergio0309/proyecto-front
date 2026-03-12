@@ -1,7 +1,7 @@
-import Api from "./apiService"
+import httpClient from "../utils/httpClient"
 
 export default {
     funListarPermisos: () => {
-        return Api().get("permissions")
+        return httpClient.get("permissions")
     }
 }

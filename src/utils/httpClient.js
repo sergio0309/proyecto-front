@@ -1,4 +1,5 @@
 import axios from "axios";
+import router from "../router";
 
 /**
  * httpClient.js - Configuración centralizada de Axios para toda la app
@@ -28,7 +29,7 @@ const httpClient = axios.create({
 httpClient.interceptors.request.use(
   (config) => {
     // Leemos el token justo en el momento de la petición, así siempre está actualizado
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -46,19 +47,32 @@ httpClient.interceptors.response.use(
     // POR FAVOR NO SOBREESCRIBIR LA RESPUESTA AQUI (nada de if response.data.status == 501, etc)
     return response;
   },
-  (error) => {
+  async (error) => {
     const status = error.response?.status;
     const url = error.config?.url || "";
-    const isLoginRequest = url === "/login" || url?.endsWith("/login");
 
-    // esto significa que si el login incluye un 401 Y la URL incluye "login", la sesión se elimina y se retorna a "auth/login"
-    if (status === 401 && !isLoginRequest) {
-      console.warn("Sesión expirada o no autorizada.");
+    // Hacemos el match más flexible y robusto.
+    const isAuthEndpoint = url.includes("/login") || url.includes("/auth");
 
-      localStorage.removeItem("access_token");
+    if (status === 401) {
+      // 1. Si es un 401 PROVOCADO por un intento de login fallido,
+      // lo dejamos pasar al catch() del componente para que muestre el error visual.
+      if (isAuthEndpoint) {
+        return Promise.reject(error);
+      }
 
-      // TODO: Mejorar esto en prod
-      window.location.href = "/auth/login";
+      // 2. Si es un 401 en cualquier OTRA parte (ej. token expirado al pedir datos del laboratorio)
+      console.warn("Sesión expirada o no autorizada. Redirigiendo...");
+      localStorage.removeItem("token");
+
+      // Importación dinámica del router para evitar la dependencia circular
+      const { default: router } = await import("../router");
+
+      // Verificamos de nuevo dinámicamente para evitar loops de redirección
+      if (router.currentRoute.value.name !== "Login") {
+        // Asegúrate que coincida con el nombre exacto en router.js
+        router.push({ name: "Login" });
+      }
     }
 
     return Promise.reject(error);
