@@ -1,17 +1,11 @@
-import Api, { ApiAuth } from "./apiService";
-
+import httpClient from "../utils/httpClient";
 
 export default {
-    login(credenciales){
-        return ApiAuth().post("login", credenciales);
+    login(credentials){
+        const { email, password } = credentials || {};
+        return httpClient.post("login", { email, password });
     },
-    // register(datos){
-    //     return ApiAuth().post("/v1/auth/register", datos);
-    // },
-    // perfil(){
-    //     return Api().get("/v1/auth/profile");
-    // },
     logout(){
-        return Api().post("logout")
+        return httpClient.post("logout")
     }
 }
