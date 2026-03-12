@@ -24,7 +24,7 @@ const currentPageTitle = ref('User Profile')
 
 const funSalir = async () => {
   await authService.logout()
-  localStorage.removeItem('access_token');
+  localStorage.removeItem('token');
   router.push({name: 'Login'})
 }
 </script>

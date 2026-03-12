@@ -1,10 +1,10 @@
-import Api from "./apiService"
+import httpClient from "../utils/httpClient"
 
 export default {
     funListarUsuarios: () => {
-        return Api().get("/users")
+        return httpClient.get("/users")
     },
     funGuardar: () => {
-        return Api().post("/users", datos)
+        return httpClient.post("/users", datos)
     }
 }
