@@ -46,11 +46,16 @@
         <Column field="ci" header="CI" />
         <Column field="email" header="Correo" />
         <Column field="phone" header="Telefono" />
+        <Column header="Fecha Nacimiento">
+            <template #body="slotProps">
+                {{ formatearFecha(slotProps.data.fecha_nacimiento) }}
+            </template>
+        </Column>
         <Column field="address" header="Direccion" />
         <Column header="Acciones" :exportable="false" style="min-width: 12rem">
             <template #body="slotProps">
-                <Button icon="pi pi-eye" severity="info" variant="outlined" rounded class="mr-2" @click="verRol(slotProps.data)" />
-                <Button icon="pi pi-pencil" variant="outlined" rounded class="mr-2" @click="editarRol(slotProps.data)" />
+                <Button icon="pi pi-eye" severity="info" variant="outlined" rounded class="mr-2" @click="verUsuario(slotProps.data)" />
+                <Button icon="pi pi-pencil" variant="outlined" rounded class="mr-2" @click="editarUsuario(slotProps.data)" />
                 <Button icon="pi pi-trash" variant="outlined" rounded severity="danger" @click="confirmarEliminacionRol(slotProps.data)" />
             </template>
         </Column>
@@ -58,19 +63,19 @@
         </DataTable>
     </div>
 
-    <Dialog v-model:visible="visibleUsuario" :style="{ width: '700px' }" header="USUARIO">
+    <Dialog v-model:visible="visibleUsuario" :style="{ width: '700px' }" :header="soloVer ? 'VER USUARIO' : 'USUARIO'">
 
         <div class="flex flex-col gap-4">
             <div class="flex gap-4">
 
                 <div class="flex-1">
                     <label class="font-bold">CI</label>
-                    <InputText v-model="usuario.ci" class="w-full" />
+                    <InputText v-model="usuario.ci" class="w-full" :disabled="soloVer"/>
                 </div>
 
                 <div class="flex-1">
                     <label class="font-bold">Correo</label>
-                    <InputText v-model="usuario.email" class="w-full" />
+                    <InputText v-model="usuario.email" class="w-full" :disabled="soloVer"/>
                 </div>
 
             </div>
@@ -79,12 +84,12 @@
 
                 <div class="col-span-6">
                     <label class="font-bold">Nombre</label>
-                    <InputText v-model="usuario.name" class="w-full" />
+                    <InputText v-model="usuario.name" class="w-full" :disabled="soloVer"/>
                 </div>
 
                 <div class="col-span-3">
                     <label class="font-bold">Telefono</label>
-                    <InputText v-model="usuario.phone" class="w-full" />
+                    <InputText v-model="usuario.phone" class="w-full" :disabled="soloVer"/>
                 </div>
 
                 <div class="col-span-3">
@@ -93,6 +98,7 @@
                         v-model="usuario.fecha_nacimiento"
                         dateFormat="dd/mm/yy"
                         class="w-full"
+                        :disabled="soloVer"
                     />
                 </div>
 
@@ -101,10 +107,10 @@
             <div class="flex gap-4">
                 <div class="flex-1">
                     <label class="font-bold">Dirección</label>
-                    <InputText v-model="usuario.address" fluid />
+                    <InputText v-model="usuario.address" fluid :disabled="soloVer"/>
                 </div>
 
-                <div class="flex-1">
+                <div class="flex-1" v-if="!soloVer">
                     <label class="font-bold">Contraseña</label>
                     <Password v-model="usuario.password" 
                     toggleMask 
@@ -113,10 +119,11 @@
                     mediumLabel="Media"
                     strongLabel="Fuerte"
                     fluid
+                    :disabled="soloVer"
                     />
                 </div>
 
-                <div class="flex-1">
+                <div class="flex-1" v-if="!soloVer">
                     <label class="font-bold">Foto Perfil</label>
 
                     <FileUpload
@@ -128,6 +135,7 @@
                         mode="basic"
                         chooseLabel="Seleccionar Imagen"
                         class="w-full"
+                        :disabled="soloVer"
                     />
                 </div>
             </div>
@@ -145,6 +153,7 @@
                     display="chip"
                     filter
                     class="w-full"
+                    :disabled="soloVer"
                 />
             </div>
         </div>
@@ -168,12 +177,24 @@ import rolService from '@/services/rolService';
 const usuarios = ref([])
 const usuario = ref({})
 const roles = ref([])
+const rolesSeleccionados = ref([])
 const visibleUsuario = ref(false)
+const soloVer = ref(false)
 
 onMounted(() => {
     funListarUsuarios()
     funListarRoles()
 })
+
+const formatearFecha = (fecha) => {
+    const date = new Date(fecha)
+
+    return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    })
+}
 
 const funListarUsuarios = async () => {
     const { data } = await usuarioService.funListarUsuarios()
@@ -187,10 +208,38 @@ const funListarRoles = async () => {
 
 const funNuevoUsuario = () => {
     usuario.value = {}
+    soloVer.value = false
     visibleUsuario.value = true
 }
 
-const funGuardar = async () => {    
+
+const verUsuario = (user) => {
+
+    usuario.value = {
+        ...user,
+        fecha_nacimiento: user.fecha_nacimiento ? new Date(user.fecha_nacimiento) : null,
+        roles: user.roles ? user.roles.map(r => r.id): []
+    }
+
+    visibleUsuario.value = true
+
+    soloVer.value = true
+}
+
+const editarUsuario = (user) => {
+    usuario.value = {
+        ...user,
+        fecha_nacimiento: user.fecha_nacimiento ? new Date(user.fecha_nacimiento) : null,
+        roles: user.roles ? user.roles.map(r => r.id): []
+    }
+
+    soloVer.value = false
+
+    visibleUsuario.value = true
+}
+
+const funGuardar = async () => {
+    
     const { data } = await usuarioService.funGuardar(usuario.value)
     visibleUsuario.value = false
     funListarUsuarios()

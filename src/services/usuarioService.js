@@ -4,7 +4,7 @@ export default {
     funListarUsuarios: () => {
         return httpClient.get("/users")
     },
-    funGuardar: () => {
+    funGuardar: (datos) => {
         return httpClient.post("/users", datos)
     }
 }
