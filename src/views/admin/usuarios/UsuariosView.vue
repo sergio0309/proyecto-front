@@ -79,6 +79,7 @@
                         chooseLabel="Seleccionar"
                         @select="(event) => formData.archivoImagen = event.files[0]"
                         class="w-full"
+                        :disabled="soloVer"
                     />
                 </div>
             </div>
@@ -94,6 +95,7 @@
                     display="chip"
                     filter
                     class="w-full"
+                    :disabled="soloVer"
                 />
             </div>
         </template>
@@ -117,7 +119,7 @@ const entityTableRef = ref(null); // 🔵 El mando a distancia para la tabla
 const usuarios = ref([]);
 const roles = ref([]);
 const isSaving = ref(false);
-
+ 
 const filters = ref({
   global: { value: null, matchMode: 'contains' },
   id: {
@@ -150,6 +152,16 @@ onMounted(() => {
     funListarUsuarios();
     funListarRoles();
 });
+
+const formatearFecha = (fecha) => {
+    const date = new Date(fecha)
+
+    return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    })
+}
 
 const funListarUsuarios = async () => {
     try {

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import AuthService from "../services/AuthService";
+import AuthService from "../services/authService";
 /**
  * Store global para manejar la autenticación del usuario (login, logout, token)
  * y compartir el estado de autenticación en toda la app.
