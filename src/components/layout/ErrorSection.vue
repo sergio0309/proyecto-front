@@ -31,7 +31,6 @@
 
     <!-- Errores de validación -->
     <ul v-if="error.validationErrors" class="text-red-500 dark:text-red-400 text-sm">
-      {{ error.validationErrors }}
       <li v-for="(msg, field) in error.validationErrors" :key="field">
         {{ Array.isArray(msg) ? msg.join(', ') : msg }}
       </li>

@@ -14,31 +14,36 @@ import router from "../router";
  */
 
 // 🔵 1. Crea una instancia de Axios con configuración base
+export const  URL = "https://api-laboratorio.ingeniasoft.cloud/api";
 const httpClient = axios.create({
   baseURL:
     import.meta.env.VITE_API_URL ||
-    "https://api-laboratorio.ingeniasoft.cloud/api",
+    URL,
   timeout: 10000, // Opcional: tiempo máximo de espera para una respuesta, 10 segundos en este caso
   headers: {
     Accept: "application/json",
-    "Content-Type": "application/json",
   },
 });
 
 // 🔵 2. Interceptor de PETICIÓN (Request) - Se ejecuta ANTES de que el frontend dispare la llamada
 httpClient.interceptors.request.use(
   (config) => {
-    // Leemos el token justo en el momento de la petición, así siempre está actualizado
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Si el body es FormData, deja que el navegador ponga el Content-Type con boundary
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+      delete config.headers.common?.["Content-Type"];
+    }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error)
 );
+
 
 // 🔵 3. Interceptor de RESPUESTA (Response) - Limpio, sin sobreescribir la data
 httpClient.interceptors.response.use(
@@ -70,7 +75,6 @@ httpClient.interceptors.response.use(
 
       // Verificamos de nuevo dinámicamente para evitar loops de redirección
       if (router.currentRoute.value.name !== "Login") {
-        // Asegúrate que coincida con el nombre exacto en router.js
         router.push({ name: "Login" });
       }
     }

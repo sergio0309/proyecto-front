@@ -59,11 +59,11 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
             </button>
 
             <div class="layout-topbar-menu hidden lg:block">
-                <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
+                <div class="layout-topbar-menu-content" title="Ir al Perfil">
+                    <RouterLink :to="{ name: 'perfil' }" class="layout-topbar-action" >
                         <i class="pi pi-user"></i>
-                        <span>Profile</span>
-                    </button>
+                        <span>Ir al Perfil</span>
+                    </RouterLink>
                 </div>
             </div>
         </div>

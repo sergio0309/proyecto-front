@@ -40,6 +40,7 @@
         :sortable="col.sortable !== false"
         :dataType="col.dataType || 'text'"
         style="min-width: 12rem"
+        :filter="col.filterable !== false"
       >
         <template #body="{ data }">
           <slot v-if="$slots[`col-${col.field}`]" :name="`col-${col.field}`" :data="data"></slot>
@@ -60,20 +61,26 @@
       </Column>
     </DataTable>
 
+    <!-- modal editar/crear -->
     <Dialog v-model:visible="itemDialog" :header="currentItem.id ? `Editar ${entityName}` : `Nuevo ${entityName}`" :modal="true" style="width: 450px">
+      
+      <!-- Mostrar errores en los modales -->
+      <ErrorSection :error="errorStore.error" />
+
       <div class="flex flex-col gap-4 mt-4">
         <slot name="form-fields" :formData="currentItem"></slot>
       </div>
       <template #footer>
-        <Button label="Cancelar" icon="pi pi-times" text @click="itemDialog = false" />
-        <Button label="Guardar" icon="pi pi-check" @click="saveItem" />
+        <Button label="Cancelar" icon="pi pi-times" text @click="closeModal" />
+        <Button label="Guardar" icon="pi pi-check" @click="saveItem" :loading="loading" />
       </template>
     </Dialog>
 
+    <!-- modal eliminar -->
     <Dialog v-model:visible="deleteDialog" :style="{ width: '450px' }" header="Confirmar Acción" :modal="true">
       <div class="flex items-center gap-4">
         <i class="pi pi-exclamation-triangle text-3xl! text-red-500" />
-        <span>¿Estás seguro de que deseas eliminar este <b>{{ entityName.toLowerCase() }}</b>?</span>
+        <span>¿Estás seguro de que deseas eliminar est@ <b>{{ entityName.toLowerCase() }}</b>?</span>
       </div>
       <template #footer>
         <Button label="No, cancelar" icon="pi pi-times" text @click="deleteDialog = false" severity="secondary" />
@@ -85,14 +92,18 @@
 
 <script setup>
 import { ref, watch } from 'vue';
+import { useErrorStore } from '../../store/useError';
+import ErrorSection from '../layout/ErrorSection.vue';
 
+const errorStore = useErrorStore()
 const props = defineProps({
   title: { type: String, default: 'Registros' },
   entityName: { type: String, default: 'Registro' },
   data: { type: Array, required: true },
   columns: { type: Array, required: true },
   filters: { type: Object, required: true },
-  globalSearchFields: { type: Array, default: () => [] }
+  globalSearchFields: { type: Array, default: () => [] },
+  loading: {type: Boolean }
 });
 
 const emit = defineEmits(['update:filters', 'save', 'delete']);
@@ -110,18 +121,25 @@ const deleteDialog = ref(false);
 const itemToDelete = ref(null);
 
 const openNew = () => {
+  errorStore.clearErrors();
   currentItem.value = {};
   itemDialog.value = true;
 };
 
 const editItem = (item) => {
+  errorStore.clearErrors();
   currentItem.value = { ...item };
   itemDialog.value = true;
 };
 
 const saveItem = () => {
   emit('save', currentItem.value);
+};
+
+// Exponemos el cierre para que el padre lo controle (ref="entityTableRef")
+const closeModal = () => {
   itemDialog.value = false;
+  errorStore.clearErrors();
 };
 
 // Abre el modal de confirmación y guarda temporalmente qué ítem vamos a borrar
@@ -142,4 +160,6 @@ const executeDelete = () => {
 const exportCSV = () => {
   dt.value.exportCSV();
 };
+
+defineExpose({ closeModal, openNew, editItem }); // Permitimos que el padre use estos métodos
 </script>

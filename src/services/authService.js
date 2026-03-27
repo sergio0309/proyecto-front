@@ -7,5 +7,8 @@ export default {
     },
     logout(){
         return httpClient.post("logout")
+    },
+    getUser(){
+        return httpClient.get("me")
     }
 }

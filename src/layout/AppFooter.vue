@@ -2,7 +2,6 @@
 
 <template>
     <div class="layout-footer">
-        SAKAI by
-        <a href="https://primevue.org" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">PrimeVue</a>
+        ISSY Clínica By <a href="https://web.ingeniasoft.cloud" class="text-primary font-bold hover:underline">IngeniaSoft Systems</a>
     </div>
 </template>

@@ -3,28 +3,34 @@
     <div class="p-5 mb-6 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
       <div class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
         <div class="flex flex-col items-center w-full gap-6 xl:flex-row">
-          <div
-            class="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800"
-          >
-            <img src="/images/ISS-logo.png" alt="user" />
+          <div class="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800">
+            <img :src=" authStore.user?.img || '/images/ISS-logo.png' " alt="user" />
           </div>
-          <div class="order-3 xl:order-2">
-            <h4
-              class="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left"
-            >
-              Musharof Chowdhury
+          
+          <div v-if="!authStore.user" class="p-4 w-48 h-10 bg-gray-200 rounded-md animate-pulse dark:bg-gray-700"></div>
+          
+          <div v-else class="order-3 xl:order-2">
+            <h4 class="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
+              {{ authStore.user.name }}
             </h4>
-            <div
-              class="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left"
-            >
-              <p class="text-sm text-gray-500 dark:text-gray-400">Team Manager</p>
+            <div class="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                {{ authStore.user.roles?.[0]?.name || "Sin rol" }}
+              </p>
               <div class="hidden h-3.5 w-px bg-gray-300 dark:bg-black xl:block"></div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Arizona, United States</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                {{ authStore.user.address || "Sin dirección" }}
+              </p>
             </div>
           </div>
         </div>
-        <button @click="isProfileInfoModal = true" class="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/3 dark:hover:text-gray-200 lg:inline-flex lg:w-auto">
-          <svg
+        
+        <button 
+          v-if="authStore.user" 
+          @click="openEditModal" 
+          class="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/3 dark:hover:text-gray-200 lg:inline-flex lg:w-auto"
+        >
+        <svg
             class="fill-current"
             width="18"
             height="18"
@@ -43,188 +49,64 @@
         </button>
       </div>
     </div>
+
     <Modal v-if="isProfileInfoModal" @close="isProfileInfoModal = false">
       <template #body>
-        <div
-          class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11"
-        >
-          <!-- close btn -->
-          <button
-            @click="isProfileInfoModal = false"
-            class="transition-color absolute right-5 top-5 z-999 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-gray-700 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:bg-white/[0.07] dark:hover:text-gray-300"
-          >
-            <svg
-              class="fill-current"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M6.04289 16.5418C5.65237 16.9323 5.65237 17.5655 6.04289 17.956C6.43342 18.3465 7.06658 18.3465 7.45711 17.956L11.9987 13.4144L16.5408 17.9565C16.9313 18.347 17.5645 18.347 17.955 17.9565C18.3455 17.566 18.3455 16.9328 17.955 16.5423L13.4129 12.0002L17.955 7.45808C18.3455 7.06756 18.3455 6.43439 17.955 6.04387C17.5645 5.65335 16.9313 5.65335 16.5408 6.04387L11.9987 10.586L7.45711 6.04439C7.06658 5.65386 6.43342 5.65386 6.04289 6.04439C5.65237 6.43491 5.65237 7.06808 6.04289 7.4586L10.5845 12.0002L6.04289 16.5418Z"
-                fill=""
-              />
-            </svg>
-          </button>
+        <div class="no-scrollbar relative w-full max-w-2xl rounded-3xl bg-white p-4 dark:bg-white/3">
           <div class="px-2 pr-14">
             <h4 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-              Edit Personal Information
+              Editar Información Personal
             </h4>
-            <p class="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-              Update your details to keep your profile up-to-date.
-            </p>
           </div>
-          <form class="flex flex-col">
-            <div class="custom-scrollbar h-[458px] overflow-y-auto p-2">
-              <div>
-                <h5 class="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                  Social Links
-                </h5>
-
-                <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                  <div>
-                    <label
-                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      Facebook
-                    </label>
-                    <input
-                      type="text"
-                      value="https://www.facebook.com/PimjoHQ"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      X.com
-                    </label>
-                    <input
-                      type="text"
-                      value="https://x.com/PimjoHQ"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      Linkedin
-                    </label>
-                    <input
-                      type="text"
-                      value="https://www.linkedin.com/company/pimjo/posts/?feedView=all"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      Instagram
-                    </label>
-                    <input
-                      type="text"
-                      value="https://instagram.com/PimjoHQ"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                    />
-                  </div>
+          
+          <form @submit.prevent="saveProfile" class="flex flex-col">
+            <div class="custom-scrollbar overflow-y-auto p-2">  
+              <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2 mt-4">
+                
+                <div class="col-span-2 lg:col-span-1">
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    Nombre de la clínica / Usuario
+                  </label>
+                  <input type="text" v-model="formData.name" class="w-full border p-2 rounded dark:bg-gray-800" />
                 </div>
-              </div>
-              <div class="mt-7">
-                <h5 class="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                  Personal Information
-                </h5>
 
-                <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                  <div class="col-span-2 lg:col-span-1">
-                    <label
-                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      value="Musharof"
-                      class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                    />
-                  </div>
-
-                  <div class="col-span-2 lg:col-span-1">
-                    <label
-                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      value="Chowdhury"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                    />
-                  </div>
-
-                  <div class="col-span-2 lg:col-span-1">
-                    <label
-                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      Email Address
-                    </label>
-                    <input
-                      type="text"
-                      value="randomuser@pimjo.com"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                    />
-                  </div>
-
-                  <div class="col-span-2 lg:col-span-1">
-                    <label
-                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      Phone
-                    </label>
-                    <input
-                      type="text"
-                      value="+09 363 398 46"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                    />
-                  </div>
-
-                  <div class="col-span-2">
-                    <label
-                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      Bio
-                    </label>
-                    <input
-                      type="text"
-                      value="Team Manager"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                    />
-                  </div>
+                <div class="col-span-2 lg:col-span-1">
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    Correo
+                  </label>
+                  <input type="email" v-model="formData.email" disabled class="w-full border p-2 rounded bg-gray-100 opacity-70 dark:bg-gray-800" />
                 </div>
+
+                <div class="col-span-2 lg:col-span-1">
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    Celular
+                  </label>
+                  <input type="text" v-model="formData.phone" class="w-full border p-2 rounded dark:bg-gray-800" />
+                </div>
+
+                <div class="col-span-2 lg:col-span-1">
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    Carnet de identidad
+                  </label>
+                  <input type="text" v-model="formData.ci" class="w-full border p-2 rounded dark:bg-gray-800" />
+                </div>
+                
+                <div class="col-span-2">
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    Dirección
+                  </label>
+                  <input type="text" v-model="formData.address" class="w-full border p-2 rounded dark:bg-gray-800" />
+                </div>
+
               </div>
             </div>
-            <div class="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-              <button
-                @click="isProfileInfoModal = false"
-                type="button"
-                class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto"
-              >
-                Close
+            
+            <div class="flex items-center gap-3 px-2 mt-6 justify-end">
+              <button @click="isProfileInfoModal = false" type="button" class="px-4 py-2 border rounded-lg">
+                Cancelar
               </button>
-              <button
-                @click="saveProfile"
-                type="button"
-                class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto"
-              >
-                Save Changes
+              <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/60">
+                Guardar Cambios
               </button>
             </div>
           </form>
@@ -235,14 +117,47 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import Modal from './Modal.vue'
+import { onMounted, ref } from 'vue'
+import Modal from './Modal.vue' // Ajusta tu ruta
+import { useAuthStore } from '../../store/useAuth'
 
+const authStore = useAuthStore()
 const isProfileInfoModal = ref(false)
 
-const saveProfile = () => {
-  // Implement save profile logic here
-  console.log('Profile saved')
+// 🔵 Nuestra "Fotocopia" para el formulario
+const formData = ref({
+  name: '',
+  email: '',
+  phone: '',
+  address: '',
+  ci: ''
+})
+
+onMounted(async () => {
+  // Solo disparamos la petición si el usuario NO existe en memoria
+  if (!authStore.user && authStore.token) {
+    await authStore.fetchUser()
+  }
+})
+
+// Función que prepara el modal ANTES de abrirlo
+const openEditModal = () => {
+  if (authStore.user) {
+    formData.value = {
+      name: authStore.user.name || '',
+      email: authStore.user.email || '',
+      phone: authStore.user.phone || '',
+      address: authStore.user.address || '',
+      ci: authStore.user.ci || ''
+    }
+  }
+  isProfileInfoModal.value = true
+}
+
+const saveProfile = async () => {
+  console.log('Enviando al backend:', formData.value)
+  // Aquí irá el await AuthService.updateProfile(formData.value)
+  // ...
   isProfileInfoModal.value = false
 }
 </script>

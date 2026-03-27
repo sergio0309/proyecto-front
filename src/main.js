@@ -1,4 +1,4 @@
-import { createApp, onMounted } from 'vue'
+import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 // import './style.css'
 import App from './App.vue'
