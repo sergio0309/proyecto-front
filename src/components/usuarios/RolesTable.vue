@@ -1,121 +1,227 @@
 <template>
   <EntityTable
-    title="Usuarios Del Sistema"
-    entityName="Usuario"
-    :data="resultados"
-    :columns="columnas"
-    v-model:filters="filtros"
-    :globalSearchFields="['nombre', 'documento', 'email']"
-    @save="guardarPaciente"
-    @delete="eliminarPaciente"
+    ref="entityTableRef"
+    title="Gestión de Roles"
+    entityName="Rol"
+    :data="roles"
+    :columns="columns"
+    v-model:filters="filters"
+    :globalSearchFields="['name']"
+    :newItemFactory="createEmptyRole"
+    :editItemMapper="mapRoleForEdit"
+    @save="guardarRol"
+    @delete="eliminarRol"
+    :loading="isSaving"
   >
-    <!-- Columna Estado con Tag -->
-    <template #col-estado="{ data }">
-      <Tag :value="data.estado" :severity="obtenerColorEstado(data.estado)" />
+    <template #col-permissions="{ data }">
+      <div class="flex flex-wrap gap-2">
+        <Tag
+          v-for="permiso in data.permissions"
+          :key="permiso.id"
+          severity="info"
+          rounded
+        >
+          {{ permiso.name }}
+        </Tag>
+
+        <span v-if="!data.permissions?.length" class="text-gray-500 italic text-sm">
+          Sin permisos
+        </span>
+      </div>
     </template>
 
-    <!-- Filtro personalizado para estado -->
-    <template #filter-estado="{ filterModel }">
-      <Select 
-        v-model="filterModel.value" 
-        :options="['Activo', 'Inactivo']" 
-        placeholder="Seleccionar Estado" 
-        class="w-full" 
-      />
-    </template>
-
-    <!-- Formulario dinámico -->
     <template #form-fields="{ formData }">
-      <div>
-        <label class="block font-bold mb-2">Nombre Completo</label>
-        <InputText v-model="formData.nombre" class="w-full" />
-      </div>
+      <div class="flex flex-col gap-4">
+        <div>
+          <label class="font-bold block mb-2">
+            Nombre del rol <span class="text-red-500">*</span>
+          </label>
+          <InputText v-model="formData.name" class="w-full" required />
+        </div>
 
-      <div>
-        <label class="block font-bold mb-2">Documento</label>
-        <InputText v-model="formData.documento" class="w-full" />
-      </div>
+        <div>
+          <label class="font-bold block mb-2">Permisos</label>
 
-      <div>
-        <label class="block font-bold mb-2">Email</label>
-        <InputText v-model="formData.email" class="w-full" />
-      </div>
+          <div v-if="permisos.length" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div
+              v-for="permiso in permisos"
+              :key="permiso.id"
+              class="flex items-center gap-2"
+            >
+              <Checkbox
+                v-model="formData.permissions"
+                :inputId="`permiso-${permiso.id}`"
+                name="permissions"
+                :value="permiso.name"
+              />
+              <label :for="`permiso-${permiso.id}`">
+                {{ permiso.name }}
+              </label>
+            </div>
+          </div>
 
-      <div>
-        <label class="block font-bold mb-2">Teléfono</label>
-        <InputText v-model="formData.telefono" class="w-full" />
-      </div>
-
-      <div>
-        <label class="block font-bold mb-2">Estado</label>
-        <Select 
-          v-model="formData.estado" 
-          :options="['Activo', 'Inactivo']" 
-          class="w-full" 
-        />
+          <p v-else class="text-gray-500 italic text-sm">
+            No hay permisos cargados.
+          </p>
+        </div>
       </div>
     </template>
-
   </EntityTable>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
+import { onMounted, ref } from 'vue';
+import { useToast } from 'primevue/usetoast';
+
 import EntityTable from '@/components/common/EntityTable.vue';
+import rolService from '@/services/rolService';
+import permisoService from '@/services/permisoService';
+import { useErrorStore } from '@/store/useError';
 
-// 1️⃣ Configuración de Columnas
-const columnas = [
-  { field: 'nombre', header: 'Nombre' },
-  { field: 'documento', header: 'Documento' },
-  { field: 'email', header: 'Email' },
-  { field: 'telefono', header: 'Teléfono' },
-  { field: 'estado', header: 'Estado' }
-];
+const toast = useToast();
+const errorStore = useErrorStore();
+const entityTableRef = ref(null);
 
-// 2️⃣ Filtros requeridos por PrimeVue
-const filtros = ref({
-  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  nombre: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-  documento: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-  email: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-  telefono: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-  estado: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] }
+const roles = ref([]);
+const permisos = ref([]);
+const isSaving = ref(false);
+
+const filters = ref({
+  global: { value: null, matchMode: 'contains' },
+  id: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  },
+  name: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  }
 });
 
-// 3️⃣ Datos simulados (MVP Sprint 1)
-const resultados = ref([
-  { id: 1, nombre: 'Juan Pérez', documento: '12345678', email: 'juan@email.com', telefono: '987654321', estado: 'Activo' },
-  { id: 2, nombre: 'María Gómez', documento: '87654321', email: 'maria@email.com', telefono: '912345678', estado: 'Activo' },
-  { id: 3, nombre: 'Carlos Ruiz', documento: '45678912', email: 'carlos@email.com', telefono: '998877665', estado: 'Inactivo' },
-  { id: 4, nombre: 'Ana Torres', documento: '11223344', email: 'ana@email.com', telefono: '944556677', estado: 'Activo' },
-  { id: 5, nombre: 'Luis Martínez', documento: '55667788', email: 'luis@email.com', telefono: '977665544', estado: 'Inactivo' }
+const columns = ref([
+  { field: 'id', header: 'ID' },
+  { field: 'name', header: 'Rol' },
+  { field: 'permissions', header: 'Permisos', sortable: false, filterable: false },
 ]);
 
-// 4️⃣ Helpers UI
-const obtenerColorEstado = (estado) => {
-  switch (estado) {
-    case 'Activo': return 'success';
-    case 'Inactivo': return 'danger';
-    default: return 'info';
+const createEmptyRole = () => ({
+  name: '',
+  permissions: []
+});
+
+const mapRoleForEdit = (role) => ({
+  ...role,
+  permissions: role.permissions ? role.permissions.map((p) => p.name) : []
+});
+
+onMounted(() => {
+  funListarRoles();
+  funListarPermisos();
+});
+
+const formatearFecha = (fecha) => {
+  if (!fecha) return '-';
+
+  const date = new Date(fecha);
+
+  return date.toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
+const funListarRoles = async () => {
+  try {
+    const { data } = await rolService.funListarRoles();
+    roles.value = data;
+  } catch (error) {
+    console.error('Error al cargar roles:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'No se pudieron cargar los roles',
+      life: 3000
+    });
   }
 };
 
-// 5️⃣ Lógica CRUD temporal (Sprint 1 modo local)
-const guardarPaciente = (paciente) => {
-  if (paciente.id) {
-    const index = pacientes.value.findIndex(p => p.id === paciente.id);
-    pacientes.value[index] = paciente;
-    console.log('Paciente actualizado (mock API)', paciente);
-  } else {
-    paciente.id = Math.floor(Math.random() * 10000);
-    pacientes.value.push(paciente);
-    console.log('Paciente creado (mock API)', paciente);
+const funListarPermisos = async () => {
+  try {
+    const { data } = await permisoService.funListarPermisos();
+    permisos.value = data.data;
+  } catch (error) {
+    console.error('Error al cargar permisos:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'No se pudieron cargar los permisos',
+      life: 3000
+    });
   }
 };
 
-const eliminarPaciente = (id) => {
-  pacientes.value = pacientes.value.filter(p => p.id !== id);
-  console.log('Paciente eliminado (mock API)', id);
+const guardarRol = async (formDataEvent) => {
+  isSaving.value = true;
+  errorStore.clearErrors();
+
+  const payload = {
+    ...formDataEvent,
+    permissions: [...(formDataEvent.permissions || [])]
+  };
+
+  try {
+    if (payload.id) {
+      await rolService.funModificar(payload.id, payload);
+      toast.add({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Rol actualizado correctamente',
+        life: 3000
+      });
+    } else {
+      await rolService.funGuardar(payload);
+      toast.add({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Rol creado correctamente',
+        life: 3000
+      });
+    }
+
+    await funListarRoles();
+    entityTableRef.value.closeModal();
+  } catch (error) {
+    errorStore.handleError(error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Revisa los campos marcados en rojo',
+      life: 3500
+    });
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+const eliminarRol = async (idRol) => {
+  try {
+    await rolService.funEliminar(idRol);
+    await funListarRoles();
+    toast.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Rol eliminado correctamente',
+      life: 3000
+    });
+  } catch (error) {
+    console.error('Error al eliminar rol:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'No se pudo eliminar el rol',
+      life: 3000
+    });
+  }
 };
 </script>

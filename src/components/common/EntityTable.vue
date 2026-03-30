@@ -103,12 +103,21 @@ const props = defineProps({
   columns: { type: Array, required: true },
   filters: { type: Object, required: true },
   globalSearchFields: { type: Array, default: () => [] },
-  loading: {type: Boolean }
+  loading: {type: Boolean },
+  // Funciones para formularios dinámicos
+  newItemFactory: {
+    type: Function,
+    default: () => ({})
+  },
+  editItemMapper: {
+    type: Function,
+    default: null
+  }
 });
 
 const emit = defineEmits(['update:filters', 'save', 'delete']);
 
-const dt = ref();
+const dt = ref(); // dt = DataTable, para exportar CSV y otras funciones avanzadas
 const internalFilters = ref(props.filters);
 watch(internalFilters, (newVal) => emit('update:filters', newVal), { deep: true });
 
@@ -128,7 +137,7 @@ const openNew = () => {
 
 const editItem = (item) => {
   errorStore.clearErrors();
-  currentItem.value = { ...item };
+  currentItem.value = props.editItemMapper ? props.editItemMapper(item) : { ...item };
   itemDialog.value = true;
 };
 
@@ -136,7 +145,7 @@ const saveItem = () => {
   emit('save', currentItem.value);
 };
 
-// Exponemos el cierre para que el padre lo controle (ref="entityTableRef")
+// Exponemos el cierre para que el padre lo controle (ej: ref="entityTableRef")
 const closeModal = () => {
   itemDialog.value = false;
   errorStore.clearErrors();

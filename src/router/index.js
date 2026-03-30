@@ -5,6 +5,7 @@ import Perfil from "../views/admin/perfil/PerfilView.vue";
 import UsuariosView from "../views/admin/usuarios/UsuariosView.vue";
 import FourZeroFour from "../views/errors/FourZeroFour.vue";
 import Role from "../views/admin/roles/Role.vue";
+import RolesView from "../views/admin/usuarios/RolesView.vue";
 
 const routes =[
     {
@@ -43,7 +44,7 @@ const routes =[
             },
             {
                 path: 'roles',
-                component: Role,
+                component: RolesView,
                 name: 'roles',
                 meta: { requireAuth: true }
             },
