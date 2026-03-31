@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import AuthService from "../services/authService";
+import { setPermissions } from "../core/ability";
 /**
  * Store global para manejar la autenticación del usuario (login, logout, token)
  * y compartir el estado de autenticación en toda la app.
@@ -35,6 +36,13 @@ export const useAuthStore = defineStore("auth", () => {
       user.value = response.data.user || null;
 
       if (user.value) {
+      localStorage.setItem("user", JSON.stringify(user.value));
+
+      const permissions = extractPermissions(user.value);
+      setPermissions(permissions);
+      }
+
+      if (user.value) {
         localStorage.setItem("user", JSON.stringify(user.value));
       }
 
@@ -56,6 +64,9 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       const response = await AuthService.getUser();
       user.value = response.data;
+     
+      const permissions = extractPermissions(user.value);
+      setPermissions(permissions);
 
       console.log("Sesión recuperada:", user.value.name);
     } catch (error) {
@@ -81,6 +92,27 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  /**
+   * Extrae los permisos del usuario para setear qué puede o no puede hacer
+   * cada usuario con roles específicos (+ permisos delegados obviamente)
+   * @param {Object|null} user 
+   * @returns {string[]} - array de permisos (ej: ["crear usuarios", "ver roles", etc])
+   */
+  function extractPermissions(user) {
+    if (!user) return [];
+
+    // ✅ futuro ideal
+    // TODO: el backend debe mostrar permisos [] con /me más adelante
+    if (user.permissions) return user.permissions;
+
+    // backend actual (al hacer GET a /roles → devuelve  permisos[])
+    if (user.roles) {
+      return user.roles.flatMap((role) => role.permissions ?? []);
+    }
+
+    return [];
+  }
+
   return {
     user,
     token,
@@ -88,5 +120,6 @@ export const useAuthStore = defineStore("auth", () => {
     login,
     logout,
     fetchUser,
+    extractPermissions
   };
 });
