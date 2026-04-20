@@ -17,7 +17,7 @@ const routes =[
         path: '/auth/login',
         component: Login,
         name: 'Login',
-        meta:{ redirectIfAuth: true }
+        meta:{ redirectIfAuth: false }
     },
     {
         path: '/admin',

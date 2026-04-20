@@ -11,6 +11,7 @@ import Chart from "primevue/chart";
 
 import '@/assets/tailwind.css';
 import '@/assets/styles.scss';
+import '@/style.css';
 
 const app = createApp(App)
 
